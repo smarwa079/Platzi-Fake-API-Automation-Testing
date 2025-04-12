@@ -38,10 +38,25 @@ public class FilesTest extends TestBase {
         uploadedFileName = response.jsonPath().getString("filename");
     }
 
+    @Severity(SeverityLevel.NORMAL)
+    @Test (dependsOnMethods = "TC1_UploadFileSuccessfully")
+    @Description("Verifies that uploading an already existing file returns the correct error response.")
+    public void TC2_UploadExistingFile()
+    {
+        File file = new File("Files-To-Upload/makeup.jpg");
+
+        given()
+                .multiPart("file",file)
+                .when().post("/files/upload")
+                .then()
+                .assertThat()
+                .statusCode(400);
+    }
+
     @Test
     @Severity(SeverityLevel.CRITICAL)
     @Description("Checks if the server handles missing file uploads and returns the correct error.")
-    public void TC2_UploadWithMissingFile()
+    public void TC3_UploadWithMissingFile()
     {
         given()
                 .when().post("/files/upload")
@@ -53,7 +68,7 @@ public class FilesTest extends TestBase {
     @Test
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifies that the server rejects unsupported file types and returns an error.")
-    public void TC3_UploadFile_InvalidFileType() {
+    public void TC4_UploadFile_InvalidFileType() {
 
         File invalidFile = new File("Files-To-Upload/chromedriver.exe");
 
@@ -68,7 +83,7 @@ public class FilesTest extends TestBase {
     @Test
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifies that the server handles incorrect content type headers and returns an error.")
-    public void TC4_UploadFile_With_IncorrectContentType() {
+    public void TC5_UploadFile_With_IncorrectContentType() {
 
         File file = new File("Files-To-Upload/skincare.jpg");
 
@@ -83,7 +98,7 @@ public class FilesTest extends TestBase {
     @Test
     @Severity(SeverityLevel.BLOCKER)
     @Description("Ensures uploaded files can be retrieved by filename.")
-    public void TC5_GetFile_Successfully() {
+    public void TC6_GetFile_Successfully() {
 
         Response response = given()
                 .pathParam("fileName", uploadedFileName)
@@ -98,7 +113,7 @@ public class FilesTest extends TestBase {
     @Test
     @Severity(SeverityLevel.MINOR)
     @Description("Verifies that the server returns an error when trying to retrieve a non-existent file.")
-    public void TC6_GetNonExistentFile()
+    public void TC7_GetNonExistentFile()
     {
         String filename = "nonexistentfile.png";
 
