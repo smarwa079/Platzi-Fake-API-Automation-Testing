@@ -95,8 +95,8 @@ public class FilesTest extends TestBase {
                 .statusCode(400);
     }
 
-    @Test
     @Severity(SeverityLevel.BLOCKER)
+    @Test (dependsOnMethods = "TC1_UploadFileSuccessfully")
     @Description("Ensures uploaded files can be retrieved by filename.")
     public void TC6_GetFile_Successfully() {
 
