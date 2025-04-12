@@ -9,7 +9,6 @@ import org.testng.annotations.Test;
 import utils.TestBase;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
 public class LocationsTest extends TestBase {
 

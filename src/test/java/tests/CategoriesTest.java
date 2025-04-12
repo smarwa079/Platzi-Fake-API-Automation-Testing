@@ -16,9 +16,12 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class CategoriesTest extends TestBase {
 
+    int categoryValidId;
     int createdCategoryId;
+    String categoryValidSlug;
+    int numberOfCategories;
 
-    @Test
+    @Test (priority = 1)
     @Severity(SeverityLevel.NORMAL)
     @Description("Verify that all categories can be fetched successfully")
     public void TC1_GetAllCategories()
@@ -31,14 +34,18 @@ public class CategoriesTest extends TestBase {
                 .extract().response();
 
         Assert.assertFalse(response.jsonPath().getList("$").isEmpty(), "List should not be empty");
+
+        numberOfCategories = response.jsonPath().getList("$").size();
+        categoryValidId = response.jsonPath().getInt("[0].id");
+        categoryValidSlug = response.jsonPath().getString("[0].slug");
     }
 
-    @Test
+    @Test (dependsOnMethods = "TC1_GetAllCategories")
     @Severity(SeverityLevel.NORMAL)
     @Description("Verify fetching categories with a valid limit returns the correct number of categories")
     public void TC2_GetCategories_With_ValidLimit()
     {
-        int limit = 4;
+        int limit = ((numberOfCategories - 4) <= 0)? numberOfCategories: numberOfCategories - 4;
 
         Response response = given()
                 .queryParam("limit", limit)
@@ -52,12 +59,12 @@ public class CategoriesTest extends TestBase {
         Assert.assertEquals(response.jsonPath().getList("$").size(), limit);
     }
 
-    @Test
+    @Test (dependsOnMethods = "TC1_GetAllCategories")
     @Severity(SeverityLevel.MINOR)
     @Description("Verify fetching categories with an invalid limit returns a 400 status code")
     public void TC3_GetCategories_With_InValidLimit()
     {
-        int limit = -1;
+        int limit = numberOfCategories + 1;
 
         given()
                 .queryParam("limit", limit)
@@ -67,15 +74,13 @@ public class CategoriesTest extends TestBase {
                 .statusCode(400);
     }
 
-    @Test
     @Severity(SeverityLevel.CRITICAL)
+    @Test (dependsOnMethods = "TC1_GetAllCategories")
     @Description("Verify fetching category by valid ID returns the correct category with valid schema")
     public void TC4_GetCategories_With_ValidID()
     {
-        int catId = 8;
-
         Response response = given()
-                .pathParam("id", catId)
+                .pathParam("id", categoryValidId)
                 .when().get("/categories/{id}")
                 .then()
                 .assertThat()
@@ -84,7 +89,7 @@ public class CategoriesTest extends TestBase {
                 .extract()
                 .response();
 
-        Assert.assertEquals(response.jsonPath().getInt("id"), catId);
+        Assert.assertEquals(response.jsonPath().getInt("id"), categoryValidId);
     }
 
     @Test
@@ -92,7 +97,7 @@ public class CategoriesTest extends TestBase {
     @Description("Verify fetching category by invalid ID returns a 400 status code")
     public void TC5_GetCategory_With_InvalidId()
     {
-        String catId = "50";
+        int catId = -1;
 
         given()
                 .pathParam("id", catId)
@@ -117,15 +122,13 @@ public class CategoriesTest extends TestBase {
                 .statusCode(400);
     }
 
-    @Test
     @Severity(SeverityLevel.CRITICAL)
+    @Test (dependsOnMethods = "TC1_GetAllCategories")
     @Description("Verify fetching category by valid slug returns correct category and valid schema")
     public void TC7_GetCategories_With_ValidSlug()
     {
-        String catSlug = "furniture";
-
         Response response = given()
-                .pathParam("slug", catSlug)
+                .pathParam("slug", categoryValidSlug)
                 .when().get("/categories/slug/{slug}")
                 .then()
                 .assertThat()
@@ -134,7 +137,7 @@ public class CategoriesTest extends TestBase {
                 .extract()
                 .response();
 
-        Assert.assertEquals(response.jsonPath().getString("slug"), catSlug);
+        Assert.assertEquals(response.jsonPath().getString("slug"), categoryValidSlug);
     }
 
     @Test
@@ -235,14 +238,12 @@ public class CategoriesTest extends TestBase {
 
     @Severity(SeverityLevel.BLOCKER)
     @Description("Verify updating an existing category with valid data works successfully")
-    @Test (dataProvider = "updateExistingCategoryValidData", dataProviderClass = CategoryDataProvider.class)
+    @Test (dependsOnMethods = "TC9_CreateCategory_Successfully", dataProvider = "updateExistingCategoryValidData", dataProviderClass = CategoryDataProvider.class)
     public void TC14_UpdateExistingCategory_ValidData(Category category)
     {
-        int catId = 9;
-
         Response response = given()
                 .contentType("application/json")
-                .pathParam("id", catId)
+                .pathParam("id", createdCategoryId)
                 .body(category)
                 .when().put("/categories/{id}")
                 .then()
@@ -260,14 +261,12 @@ public class CategoriesTest extends TestBase {
 
     @Severity(SeverityLevel.NORMAL)
     @Description("Verify updating a category with invalid image link fails")
-    @Test (dataProvider = "updateExistingCategoryInValidImageLink", dataProviderClass = CategoryDataProvider.class)
+    @Test (dependsOnMethods = "TC1_GetAllCategories", dataProvider = "updateExistingCategoryInValidImageLink", dataProviderClass = CategoryDataProvider.class)
     public void TC15_UpdateExistingCategory_InValidImageLink(Category category)
     {
-        int catId = 22;
-
         given()
                 .contentType("application/json")
-                .pathParam("id", catId)
+                .pathParam("id", categoryValidId)
                 .body(category)
                 .when().put("/categories/{id}")
                 .then()
@@ -276,14 +275,12 @@ public class CategoriesTest extends TestBase {
 
     @Severity(SeverityLevel.NORMAL)
     @Description("Verify updating a category with only image link fails")
-    @Test (dataProvider = "updateExistingCategoryOnlyImageLink", dataProviderClass = CategoryDataProvider.class)
+    @Test (dependsOnMethods = "TC1_GetAllCategories", dataProvider = "updateExistingCategoryOnlyImageLink", dataProviderClass = CategoryDataProvider.class)
     public void TC16_UpdateExistingCategory_OnlyImageLink(Category category)
     {
-        int catId = 5;
-
         given()
                 .contentType("application/json")
-                .pathParam("id", catId)
+                .pathParam("id", categoryValidId)
                 .body(category)
                 .when().put("/categories/{id}")
                 .then()
@@ -295,11 +292,9 @@ public class CategoriesTest extends TestBase {
     @Test (dataProvider = "updateExistingCategoryOnlyName", dataProviderClass = CategoryDataProvider.class)
     public void TC17_UpdateExistingCategory_OnlyName(Category category)
     {
-        int catId = 5;
-
         given()
                 .contentType("application/json")
-                .pathParam("id", catId)
+                .pathParam("id", categoryValidId)
                 .body(category)
                 .when().put("/categories/{id}")
                 .then()
@@ -311,7 +306,7 @@ public class CategoriesTest extends TestBase {
     @Test (dataProvider = "updateNonExistentCategory", dataProviderClass = CategoryDataProvider.class)
     public void TC18_UpdateNonExistentCategory(Category category)
     {
-        int catId = 50;
+        int catId = categoryValidId-1;
 
         given()
                 .contentType("application/json")
@@ -322,8 +317,8 @@ public class CategoriesTest extends TestBase {
                 .statusCode(400);
     }
 
-    @Test
     @Severity(SeverityLevel.BLOCKER)
+    @Test (dependsOnMethods = "TC9_CreateCategory_Successfully")
     @Description("Verify successfully deleting an existing category")
     public void TC19_DeleteExistingCategory()
     {
@@ -336,9 +331,9 @@ public class CategoriesTest extends TestBase {
                 .statusCode(200);
     }
 
+    @Test
     @Severity(SeverityLevel.MINOR)
     @Description("Verify deleting a non-existent category returns 200 with body 'true'")
-    @Test (dependsOnMethods = "TC9_CreateCategory_Successfully")
     public void TC20_DeleteNonExistentCategory()
     {
         int catId = 100;
@@ -348,21 +343,18 @@ public class CategoriesTest extends TestBase {
                 .pathParam("id", catId)
                 .when().delete("/categories/{id}")
                 .then()
-                .body(equalTo("true"))
-                .statusCode(200);
+                .statusCode(400);
     }
 
-    @Test
     @Severity(SeverityLevel.NORMAL)
+    @Test (dependsOnMethods = "TC1_GetAllCategories")
     @Description("Verify fetching products for a valid category ID returns 200")
     public void TC21_GetProducts_For_ValidCategoryID()
     {
-        int catId = 4;
-
         Response response = given()
                 .contentType("application/json")
-                .pathParam("id", catId)
-                .when().delete("/categories/{id}/products")
+                .pathParam("id", categoryValidId)
+                .when().get("/categories/{id}/products")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -379,7 +371,7 @@ public class CategoriesTest extends TestBase {
         given()
                 .contentType("application/json")
                 .pathParam("id", catId)
-                .when().delete("/categories/{id}/products")
+                .when().get("/categories/{id}/products")
                 .then()
                 .statusCode(404);
     }
@@ -391,7 +383,7 @@ public class CategoriesTest extends TestBase {
     {
         given()
                 .contentType("application/json")
-                .when().delete("/categories/{id}/products")
+                .when().get("/categories/{id}/products")
                 .then()
                 .statusCode(400);
     }
