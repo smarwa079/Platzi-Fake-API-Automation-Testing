@@ -17,9 +17,11 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class ProductsTest extends TestBase {
 
-    public int createdProductId;
+    int createdProductId;
+    int productValidId;
+    String productValidSlug;
 
-    @Test
+    @Test (priority = 1)
     @Severity(SeverityLevel.NORMAL)
     @Description ("Verify that the API returns a list of all available products.")
     public void TC1_GetAllProducts()
@@ -32,17 +34,18 @@ public class ProductsTest extends TestBase {
                 .extract().response();
 
         Assert.assertFalse(response.jsonPath().getList("$").isEmpty(), "List should not be empty");
+
+        productValidId = response.jsonPath().getInt("[0].id");
+        productValidSlug = response.jsonPath().getString("[0].slug");
     }
 
-    @Test
     @Severity(SeverityLevel.NORMAL)
+    @Test (dependsOnMethods = "TC1_GetAllProducts")
     @Description ("Ensure the API returns the correct product details when a valid product ID is provided.")
     public void TC2_GetProduct_By_ValidId()
     {
-        int productId = 129;
-
         Response response = given()
-                .pathParam("id", productId)
+                .pathParam("id", productValidId)
                 .when().get("/products/{id}")
                 .then()
                 .assertThat()
@@ -51,7 +54,7 @@ public class ProductsTest extends TestBase {
                 .extract()
                 .response();
 
-        Assert.assertEquals(response.jsonPath().getInt("id"), productId);
+        Assert.assertEquals(response.jsonPath().getInt("id"), productValidId);
     }
 
     @Test
@@ -73,15 +76,13 @@ public class ProductsTest extends TestBase {
         Assert.assertEquals(response.jsonPath().getString("name"), "EntityNotFoundError");
     }
 
-    @Test
     @Severity (SeverityLevel.NORMAL)
+    @Test (dependsOnMethods = "TC1_GetAllProducts")
     @Description ("Ensure the API returns the correct product details when a valid product Slug is provided.")
     public void TC4_GetProduct_By_ValidSlug()
     {
-        String productSlug = "trendy-pink-tinted-sunglasses";
-
         Response response = given()
-                .pathParam("slug", productSlug)
+                .pathParam("slug", productValidSlug)
                 .when().get("/products/slug/{slug}")
                 .then()
                 .assertThat()
@@ -90,7 +91,7 @@ public class ProductsTest extends TestBase {
                 .extract()
                 .response();
 
-        Assert.assertEquals(response.jsonPath().getString("slug"), productSlug);
+        Assert.assertEquals(response.jsonPath().getString("slug"), productValidSlug);
     }
 
     @Test
@@ -114,7 +115,7 @@ public class ProductsTest extends TestBase {
 
     @Severity(SeverityLevel.CRITICAL)
     @Description ("Validate that a new product can be created with valid data.")
-    @Test (dataProvider = "createProductValidData", dataProviderClass = ProductDataProvider.class)
+    @Test (priority = 2, dataProvider = "createProductValidData", dataProviderClass = ProductDataProvider.class)
     public void TC6_CreateProduct_With_ValidData(Product product) {
 
         Response response = given()
@@ -160,12 +161,12 @@ public class ProductsTest extends TestBase {
 
     @Severity (SeverityLevel.CRITICAL)
     @Description ("Confirm that updating a product with valid data modifies the existing product.")
-    @Test (dataProvider = "updateExistingProductValidData", dataProviderClass = ProductDataProvider.class)
-    public void TC9_UpdateExistingProduct(Product product, int productId)
+    @Test (priority = 3, dataProvider = "updateExistingProductValidData", dataProviderClass = ProductDataProvider.class)
+    public void TC9_UpdateExistingProduct(Product product)
     {
         given()
                 .header("Content-Type", "application/json")
-                .pathParam("id", productId)
+                .pathParam("id", createdProductId)
                 .body(product)
                 .when().put("/products/{id}")
                 .then()
@@ -176,27 +177,27 @@ public class ProductsTest extends TestBase {
 
     @Severity (SeverityLevel.MINOR)
     @Description ("Verify that the API returns an error when attempting to update a product using the unsupported PATCH method.")
-    @Test (dataProvider = "updateExistingProductValidData", dataProviderClass = ProductDataProvider.class)
-    public void TC10_UpdateExistingProduct_Using_PATCH(Product product, int productId)
+    @Test (dependsOnMethods = "TC6_CreateProduct_With_ValidData", dataProvider = "updateExistingProductValidData", dataProviderClass = ProductDataProvider.class)
+    public void TC10_UpdateExistingProduct_Using_PATCH(Product product)
     {
         given()
                 .header("Content-Type", "application/json")
-                .pathParam("id", productId)
+                .pathParam("id", createdProductId)
                 .body(product)
                 .when().patch("/products/{id}")
                 .then()
                 .assertThat()
-                .statusCode(anyOf(equalTo(405), equalTo(404)));
+                .statusCode(405);
     }
 
     @Severity (SeverityLevel.MINOR)
     @Description ("Check if the API returns an appropriate error when updating a product that doesn't exist.")
     @Test (dataProvider = "updateNonExistentProductData", dataProviderClass = ProductDataProvider.class)
-    public void TC11_UpdateNonExistentProduct(Product product, int productId)
+    public void TC11_UpdateNonExistentProduct(Product product)
     {
         Response response = given()
                 .header("Content-Type", "application/json")
-                .pathParam("id", productId)
+                .pathParam("id", createdProductId-1)
                 .body(product)
                 .when().put("/products/{id}")
                 .then()
@@ -208,7 +209,7 @@ public class ProductsTest extends TestBase {
         Assert.assertEquals(response.jsonPath().getString("name"), "EntityNotFoundError");
     }
 
-    @Test (dependsOnMethods = "TC6_CreateProduct_With_ValidData")
+    @Test (priority = 4)
     @Severity (SeverityLevel.CRITICAL)
     @Description ("Ensure that a product can be successfully deleted.")
     public void TC12_DeleteExistingProduct()

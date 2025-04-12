@@ -154,6 +154,6 @@ public class UsersTest extends TestBase {
                 .statusCode(201)
                 .extract()
                 .response();
-        Assert.assertEquals(response.jsonPath().getBoolean("isAvailable"), true);
+        Assert.assertTrue(response.jsonPath().getBoolean("isAvailable"));
     }
 }

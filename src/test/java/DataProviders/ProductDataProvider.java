@@ -44,34 +44,29 @@ public class ProductDataProvider
     }
 
     @DataProvider (name = "updateExistingProductValidData")
-    public static Object[][] updateExistingProductValidData()
+    public static Product[] updateExistingProductValidData()
     {
         Product updatedProduct = new Product();
         updatedProduct.setTitle("Desk");
         updatedProduct.setPrice(1000);
 
-        return new Object[][]
+        return new Product[]
                 {
-                        {
-                                updatedProduct,
-                                172
-                        }
+                        updatedProduct
+
                 };
     }
 
     @DataProvider (name = "updateNonExistentProductData")
-    public static Object[][] updateNonExistentProductData()
+    public static Product[] updateNonExistentProductData()
     {
         Product updatedProduct = new Product();
         updatedProduct.setTitle("Dress");
         updatedProduct.setPrice(800);
 
-        return new Object[][]
+        return new Product[]
                 {
-                        {
-                                updatedProduct,
-                                30
-                        }
+                        updatedProduct
                 };
     }
 }
