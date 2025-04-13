@@ -59,6 +59,7 @@ public class FilesTest extends TestBase {
     public void TC3_UploadWithMissingFile()
     {
         given()
+                .multiPart("file", "")
                 .when().post("/files/upload")
                 .then()
                 .assertThat()

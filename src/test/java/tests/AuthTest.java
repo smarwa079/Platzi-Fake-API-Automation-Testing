@@ -64,7 +64,7 @@ public class AuthTest extends TestBase {
     }
 
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Verify login with missing password returns 400 Bad Request.")
+    @Description("Verify login with missing password returns 401 Unauthorized.")
     @Test (dataProvider = "loginMissingPassword", dataProviderClass = AuthDataProvider.class)
     public void TC4_Login_With_MissingPassword(Login login)
     {
@@ -74,11 +74,11 @@ public class AuthTest extends TestBase {
                 .when().post("/auth/login")
                 .then()
                 .assertThat()
-                .statusCode(400);
+                .statusCode(401);
     }
 
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Verify login with missing email returns 400 Bad Request.")
+    @Description("Verify login with missing email returns 401 Unauthorized.")
     @Test (dataProvider = "loginMissingEmail", dataProviderClass = AuthDataProvider.class)
     public void TC5_Login_With_MissingEmail(Login login)
     {
@@ -88,7 +88,7 @@ public class AuthTest extends TestBase {
                 .when().post("/auth/login")
                 .then()
                 .assertThat()
-                .statusCode(400);
+                .statusCode(401);
     }
 
     @Severity(SeverityLevel.CRITICAL)
@@ -164,6 +164,20 @@ public class AuthTest extends TestBase {
         given()
                 .header("Content-Type", "application/json")
                 .body(refresh)
+                .when().post("/auth/refresh-token")
+                .then()
+                .assertThat()
+                .statusCode(401);
+    }
+
+    @Test
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify refresh token request without token returns 400 Bad Request.")
+    public void TC11_RefreshToken_Without_Token()
+    {
+        given()
+                .header("Content-Type", "application/json")
+                .body("{}")
                 .when().post("/auth/refresh-token")
                 .then()
                 .assertThat()

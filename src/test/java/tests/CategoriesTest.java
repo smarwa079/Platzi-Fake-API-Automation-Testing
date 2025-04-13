@@ -385,6 +385,7 @@ public class CategoriesTest extends TestBase {
     {
         given()
                 .contentType("application/json")
+                .pathParam("id", "")
                 .when().get("/categories/{id}/products")
                 .then()
                 .statusCode(400);
