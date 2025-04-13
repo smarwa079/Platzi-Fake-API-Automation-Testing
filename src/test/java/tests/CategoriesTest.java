@@ -359,6 +359,8 @@ public class CategoriesTest extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
+
+        Assert.assertFalse(response.jsonPath().getList("$").isEmpty(), "List should not be empty");
     }
 
     @Test
@@ -373,7 +375,7 @@ public class CategoriesTest extends TestBase {
                 .pathParam("id", catId)
                 .when().get("/categories/{id}/products")
                 .then()
-                .statusCode(404);
+                .statusCode(400);
     }
 
     @Test
