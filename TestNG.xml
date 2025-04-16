@@ -1,42 +1,19 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 
-<suite parallel="tests"  name="Platzi Fake Store API" verbose="1">
-
-<!--    that means maximum, it will allow 5 methods to run in parallel from this Java class file-->
+<suite name="Platzi Fake Store API">
     <test thread-count="5" name="ProductTests">
         <classes>
             <class name="tests.ProductsTest"/>
-        </classes>
-    </test>
-
-    <test thread-count="5" name="CategoriesTest">
-        <classes>
             <class name="tests.CategoriesTest"/>
-        </classes>
-    </test>
-
-    <test thread-count="5" name="UsersTests">
-        <classes>
-            <class name="tests.UsersTest"/>
-        </classes>
-    </test>
-
-    <test thread-count="5" name="AuthTests">
-        <classes>
-            <class name="tests.AuthTest"/>
-        </classes>
-    </test>
-
-    <test thread-count="5" name="LocationsTests">
-        <classes>
             <class name="tests.LocationsTest"/>
-        </classes>
-    </test>
-
-    <test thread-count="5" name="FilesTest">
-        <classes>
             <class name="tests.FilesTest"/>
         </classes>
     </test>
 
+    <test name="UserTests">
+        <classes>
+            <class name="tests.UsersTest"/>
+            <class name="tests.AuthTest"/>
+        </classes>
+    </test>
 </suite>
