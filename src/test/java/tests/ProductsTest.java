@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import POJO.Product;
 import DataProviders.ProductDataProvider;
 import utils.TestBase;
+import utils.Variables;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
@@ -16,10 +17,6 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 
 public class ProductsTest extends TestBase {
-
-    int createdProductId;
-    int productValidId;
-    String productValidSlug;
 
     @Test (priority = 1)
     @Severity(SeverityLevel.NORMAL)
@@ -35,8 +32,8 @@ public class ProductsTest extends TestBase {
 
         Assert.assertFalse(response.jsonPath().getList("$").isEmpty(), "List should not be empty");
 
-        productValidId = response.jsonPath().getInt("[0].id");
-        productValidSlug = response.jsonPath().getString("[0].slug");
+        Variables.productValidId = response.jsonPath().getInt("[0].id");
+        Variables.productValidSlug = response.jsonPath().getString("[0].slug");
     }
 
     @Severity(SeverityLevel.NORMAL)
@@ -45,7 +42,7 @@ public class ProductsTest extends TestBase {
     public void TC2_GetProduct_By_ValidId()
     {
         Response response = given()
-                .pathParam("id", productValidId)
+                .pathParam("id", Variables.productValidId)
                 .when().get("/products/{id}")
                 .then()
                 .assertThat()
@@ -54,7 +51,7 @@ public class ProductsTest extends TestBase {
                 .extract()
                 .response();
 
-        Assert.assertEquals(response.jsonPath().getInt("id"), productValidId);
+        Assert.assertEquals(response.jsonPath().getInt("id"), Variables.productValidId);
     }
 
     @Test
@@ -82,7 +79,7 @@ public class ProductsTest extends TestBase {
     public void TC4_GetProduct_By_ValidSlug()
     {
         Response response = given()
-                .pathParam("slug", productValidSlug)
+                .pathParam("slug", Variables.productValidSlug)
                 .when().get("/products/slug/{slug}")
                 .then()
                 .assertThat()
@@ -91,7 +88,7 @@ public class ProductsTest extends TestBase {
                 .extract()
                 .response();
 
-        Assert.assertEquals(response.jsonPath().getString("slug"), productValidSlug);
+        Assert.assertEquals(response.jsonPath().getString("slug"), Variables.productValidSlug);
     }
 
     @Test
@@ -127,7 +124,7 @@ public class ProductsTest extends TestBase {
                 .body(matchesJsonSchemaInClasspath("product-schema.json"))
                 .extract()
                 .response();
-        createdProductId = response.jsonPath().getInt("id");
+        Variables.createdProductId = response.jsonPath().getInt("id");
         Assert.assertEquals(response.statusCode(), 201, "Status code should be 201");
     }
 
@@ -166,7 +163,7 @@ public class ProductsTest extends TestBase {
     {
         given()
                 .header("Content-Type", "application/json")
-                .pathParam("id", createdProductId)
+                .pathParam("id", Variables.createdProductId)
                 .body(product)
                 .when().put("/products/{id}")
                 .then()
@@ -182,7 +179,7 @@ public class ProductsTest extends TestBase {
     {
         given()
                 .header("Content-Type", "application/json")
-                .pathParam("id", createdProductId)
+                .pathParam("id", Variables.createdProductId)
                 .body(product)
                 .when().patch("/products/{id}")
                 .then()
@@ -197,7 +194,7 @@ public class ProductsTest extends TestBase {
     {
         Response response = given()
                 .header("Content-Type", "application/json")
-                .pathParam("id", createdProductId-1)
+                .pathParam("id", Variables.createdProductId-1)
                 .body(product)
                 .when().put("/products/{id}")
                 .then()
@@ -215,7 +212,7 @@ public class ProductsTest extends TestBase {
     public void TC12_DeleteExistingProduct()
     {
         given()
-                .pathParam("id", createdProductId)
+                .pathParam("id", Variables.createdProductId)
                 .when().delete("/products/{id}")
                 .then()
                 .assertThat()

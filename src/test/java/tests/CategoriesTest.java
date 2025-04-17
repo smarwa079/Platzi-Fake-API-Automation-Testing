@@ -9,18 +9,14 @@ import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import utils.TestBase;
+import utils.Variables;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
 
-public class CategoriesTest extends TestBase {
-
-    int categoryValidId;
-    int createdCategoryId;
-    String categoryValidSlug;
-    int numberOfCategories;
-
+public class CategoriesTest extends TestBase
+{
     @Test (priority = 1)
     @Severity(SeverityLevel.NORMAL)
     @Description("Verify that all categories can be fetched successfully")
@@ -35,9 +31,9 @@ public class CategoriesTest extends TestBase {
 
         Assert.assertFalse(response.jsonPath().getList("$").isEmpty(), "List should not be empty");
 
-        numberOfCategories = response.jsonPath().getList("$").size();
-        categoryValidId = response.jsonPath().getInt("[0].id");
-        categoryValidSlug = response.jsonPath().getString("[0].slug");
+        Variables.numberOfCategories = response.jsonPath().getList("$").size();
+        Variables.categoryValidId = response.jsonPath().getInt("[0].id");
+        Variables.categoryValidSlug = response.jsonPath().getString("[0].slug");
     }
 
     @Test (dependsOnMethods = "TC1_GetAllCategories")
@@ -45,10 +41,8 @@ public class CategoriesTest extends TestBase {
     @Description("Verify fetching categories with a valid limit returns the correct number of categories")
     public void TC2_GetCategories_With_ValidLimit()
     {
-        int limit = ((numberOfCategories - 4) <= 0)? numberOfCategories: numberOfCategories - 4;
-
         Response response = given()
-                .queryParam("limit", limit)
+                .queryParam("limit", Variables.categoryValidLimit)
                 .when().get("/categories")
                 .then()
                 .assertThat()
@@ -56,7 +50,7 @@ public class CategoriesTest extends TestBase {
                 .extract()
                 .response();
 
-        Assert.assertEquals(response.jsonPath().getList("$").size(), limit);
+        Assert.assertEquals(response.jsonPath().getList("$").size(), Variables.categoryValidLimit);
     }
 
     @Test (dependsOnMethods = "TC1_GetAllCategories")
@@ -64,10 +58,8 @@ public class CategoriesTest extends TestBase {
     @Description("Verify fetching categories with an invalid limit returns a 400 status code")
     public void TC3_GetCategories_With_InValidLimit()
     {
-        int limit = numberOfCategories + 1;
-
         given()
-                .queryParam("limit", limit)
+                .queryParam("limit", Variables.categoryExceedingLimit)
                 .when().get("/categories")
                 .then()
                 .assertThat()
@@ -80,7 +72,7 @@ public class CategoriesTest extends TestBase {
     public void TC4_GetCategories_With_ValidID()
     {
         Response response = given()
-                .pathParam("id", categoryValidId)
+                .pathParam("id", Variables.categoryValidId)
                 .when().get("/categories/{id}")
                 .then()
                 .assertThat()
@@ -89,7 +81,7 @@ public class CategoriesTest extends TestBase {
                 .extract()
                 .response();
 
-        Assert.assertEquals(response.jsonPath().getInt("id"), categoryValidId);
+        Assert.assertEquals(response.jsonPath().getInt("id"), Variables.categoryValidId);
     }
 
     @Test
@@ -128,7 +120,7 @@ public class CategoriesTest extends TestBase {
     public void TC7_GetCategories_With_ValidSlug()
     {
         Response response = given()
-                .pathParam("slug", categoryValidSlug)
+                .pathParam("slug", Variables.categoryValidSlug)
                 .when().get("/categories/slug/{slug}")
                 .then()
                 .assertThat()
@@ -137,7 +129,7 @@ public class CategoriesTest extends TestBase {
                 .extract()
                 .response();
 
-        Assert.assertEquals(response.jsonPath().getString("slug"), categoryValidSlug);
+        Assert.assertEquals(response.jsonPath().getString("slug"), Variables.categoryValidSlug);
     }
 
     @Test
@@ -171,7 +163,7 @@ public class CategoriesTest extends TestBase {
                 .extract()
                 .response();
 
-        createdCategoryId = response.jsonPath().getInt("id");
+        Variables.createdCategoryId = response.jsonPath().getInt("id");
 
         String name = response.jsonPath().getString("name");
         String image = response.jsonPath().getString("image");
@@ -243,7 +235,7 @@ public class CategoriesTest extends TestBase {
     {
         Response response = given()
                 .contentType("application/json")
-                .pathParam("id", createdCategoryId)
+                .pathParam("id", Variables.createdCategoryId)
                 .body(category)
                 .when().put("/categories/{id}")
                 .then()
@@ -266,7 +258,7 @@ public class CategoriesTest extends TestBase {
     {
         given()
                 .contentType("application/json")
-                .pathParam("id", categoryValidId)
+                .pathParam("id", Variables.categoryValidId)
                 .body(category)
                 .when().put("/categories/{id}")
                 .then()
@@ -280,7 +272,7 @@ public class CategoriesTest extends TestBase {
     {
         given()
                 .contentType("application/json")
-                .pathParam("id", categoryValidId)
+                .pathParam("id", Variables.categoryValidId)
                 .body(category)
                 .when().put("/categories/{id}")
                 .then()
@@ -294,7 +286,7 @@ public class CategoriesTest extends TestBase {
     {
         given()
                 .contentType("application/json")
-                .pathParam("id", categoryValidId)
+                .pathParam("id", Variables.categoryValidId)
                 .body(category)
                 .when().put("/categories/{id}")
                 .then()
@@ -306,7 +298,7 @@ public class CategoriesTest extends TestBase {
     @Test (dataProvider = "updateNonExistentCategory", dataProviderClass = CategoryDataProvider.class)
     public void TC18_UpdateNonExistentCategory(Category category)
     {
-        int catId = categoryValidId-1;
+        int catId = Variables.categoryValidId-1;
 
         given()
                 .contentType("application/json")
@@ -324,7 +316,7 @@ public class CategoriesTest extends TestBase {
     {
         given()
                 .contentType("application/json")
-                .pathParam("id", createdCategoryId)
+                .pathParam("id", Variables.createdCategoryId)
                 .when().delete("/categories/{id}")
                 .then()
                 .body(equalTo("true"))
@@ -353,7 +345,7 @@ public class CategoriesTest extends TestBase {
     {
         Response response = given()
                 .contentType("application/json")
-                .pathParam("id", categoryValidId)
+                .pathParam("id", Variables.categoryValidId)
                 .when().get("/categories/{id}/products")
                 .then()
                 .statusCode(200)

@@ -3,19 +3,18 @@ package DataProviders;
 import org.testng.annotations.DataProvider;
 import POJO.Login;
 import POJO.RefreshToken;
+import utils.Variables;
 
-public class AuthDataProvider {
-
-    public static String accessToken;
-    public static String refreshToken;
+public class AuthDataProvider
+{
 
     @DataProvider (name = "loginValidData")
     public static Login[] loginValidData()
     {
         Login validLogin = new Login();
 
-        validLogin.setEmail("admin@mail.com");
-        validLogin.setPassword("admin123");
+        validLogin.setEmail(UserDataProvider.userEmail);
+        validLogin.setPassword(UserDataProvider.userPassword);
 
         return new Login[] {
                 validLogin
@@ -27,7 +26,7 @@ public class AuthDataProvider {
     {
         Login invalidLogin = new Login();
 
-        invalidLogin.setEmail("admin@mail.com");
+        invalidLogin.setEmail(UserDataProvider.userEmail);
         invalidLogin.setPassword("root555");
 
         return new Login[] {
@@ -41,7 +40,7 @@ public class AuthDataProvider {
         Login invalidLogin = new Login();
 
         invalidLogin.setEmail("admin555@mail.com");
-        invalidLogin.setPassword("root");
+        invalidLogin.setPassword(UserDataProvider.userPassword);
 
         return new Login[] {
                 invalidLogin
@@ -76,7 +75,7 @@ public class AuthDataProvider {
     public Object[] validRefreshToken()
     {
         RefreshToken validRefresh = new RefreshToken();
-        validRefresh.setRefreshToken(refreshToken);
+        validRefresh.setRefreshToken(Variables.refreshToken);
 
         return new Object[]
                 {

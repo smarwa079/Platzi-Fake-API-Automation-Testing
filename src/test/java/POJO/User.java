@@ -8,6 +8,7 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private String role;
     private String avatar;
 
     public void setName(String name) {
@@ -26,6 +27,10 @@ public class User {
         this.avatar = avatar;
     }
 
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public String getName() {
         return name;
     }
@@ -40,5 +45,9 @@ public class User {
 
     public String getAvatar() {
         return avatar;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

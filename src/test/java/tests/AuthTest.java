@@ -10,6 +10,7 @@ import org.testng.annotations.Test;
 import POJO.Login;
 import POJO.RefreshToken;
 import utils.TestBase;
+import utils.Variables;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
@@ -31,8 +32,8 @@ public class AuthTest extends TestBase {
                 .statusCode(201)
                 .extract()
                 .response();
-        AuthDataProvider.accessToken = response.jsonPath().getString("access_token");
-        AuthDataProvider.refreshToken = response.jsonPath().getString("refresh_token");
+        Variables.accessToken = response.jsonPath().getString("access_token");
+        Variables.refreshToken = response.jsonPath().getString("refresh_token");
     }
 
     @Severity(SeverityLevel.CRITICAL)
@@ -97,7 +98,7 @@ public class AuthTest extends TestBase {
     public void TC6_RetrieveUserProfile_With_ValidData(Login login)
     {
         Response response = given()
-                .header("Authorization", "Bearer " + AuthDataProvider.accessToken)
+                .header("Authorization", "Bearer " + Variables.accessToken)
                 .header("Content-Type", "application/json")
                 .body(login)
                 .when().get("/auth/profile")
