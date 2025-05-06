@@ -2,6 +2,7 @@ package DataProviders;
 
 import POJO.Category;
 import org.testng.annotations.DataProvider;
+import utils.Variables;
 
 public class CategoryDataProvider
 {
@@ -11,8 +12,8 @@ public class CategoryDataProvider
     {
         Category validCategory = new Category();
 
-        validCategory.setName("Fruits");
-        validCategory.setImage("https://imgur.com/SvL0zaZ");
+        validCategory.setName(Variables.categoryName);
+        validCategory.setImage(Variables.categoryImage);
 
         return new Category[]
                 {
@@ -25,7 +26,7 @@ public class CategoryDataProvider
     {
         Category invalidCategory = new Category();
 
-        invalidCategory.setName("Books");
+        invalidCategory.setName(Variables.categoryName);
         invalidCategory.setImage("link");
 
         return new Category[]
@@ -39,7 +40,7 @@ public class CategoryDataProvider
     {
         Category invalidCategory = new Category();
 
-        invalidCategory.setImage("https://imgur.com/SvL0zaZ");
+        invalidCategory.setImage(Variables.categoryImage);
 
         return new Category[]
                 {
@@ -52,7 +53,7 @@ public class CategoryDataProvider
     {
         Category invalidCategory = new Category();
 
-        invalidCategory.setName("Headphones");
+        invalidCategory.setName(Variables.faker.commerce().department());
 
         return new Category[]
                 {
@@ -65,8 +66,8 @@ public class CategoryDataProvider
     {
         Category valiCategory = new Category();
 
-        valiCategory.setName("suits");
-        valiCategory.setImage("https://imgur.com/a/Jy9Vb2Z");
+        valiCategory.setName(Variables.categoryName + "Updated");
+        valiCategory.setImage(Variables.categoryImage + "Updated");
 
         return new Category[]
                 {
@@ -79,7 +80,7 @@ public class CategoryDataProvider
     {
         Category category = new Category();
 
-        category.setName("Toys");
+        category.setName(Variables.categoryName + "Updated");
         category.setImage("link");
 
         return new Category[]
@@ -93,7 +94,7 @@ public class CategoryDataProvider
     {
         Category category = new Category();
 
-        category.setImage("https://imgur.com/HmvYLNi");
+        category.setImage(Variables.categoryImage + "Updated");
 
         return new Category[]
                 {
@@ -106,7 +107,7 @@ public class CategoryDataProvider
     {
         Category category = new Category();
 
-        category.setName("Garden tools");
+        category.setName(Variables.categoryName + "Updated");
 
         return new Category[]
                 {
@@ -119,8 +120,8 @@ public class CategoryDataProvider
     {
         Category category = new Category();
 
-        category.setName("Sewing Kit");
-        category.setImage("https://imgur.com/1cI820n");
+        category.setName(Variables.faker.commerce().department() + "Updated");
+        category.setImage(Variables.faker.internet().image(200, 200, true, category.getName()));
 
         return new Category[]
                 {

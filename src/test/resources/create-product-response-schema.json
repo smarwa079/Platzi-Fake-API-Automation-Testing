@@ -1,9 +1,6 @@
 {
   "type": "object",
   "properties": {
-    "id": {
-      "type": "integer"
-    },
     "title": {
       "type": "string"
     },
@@ -46,15 +43,26 @@
         "image",
         "slug"
       ]
+    },
+    "id": {
+      "type": "integer"
+    },
+    "creationAt": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string"
     }
   },
   "required": [
-    "id",
     "title",
     "slug",
     "price",
     "description",
     "images",
-    "category"
+    "category",
+    "id",
+    "creationAt",
+    "updatedAt"
   ]
 }

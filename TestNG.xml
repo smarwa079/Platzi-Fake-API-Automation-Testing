@@ -1,19 +1,57 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 
-<suite name="Platzi Fake Store API">
-    <test thread-count="5" name="Test1">
+<suite name="Platzi Fake Store API" parallel="false">
+
+    <listeners>
+        <listener class-name="utils.TestListener"/>
+    </listeners>
+
+    <test name="Categories">
         <classes>
-            <class name="tests.ProductsTest"/>
-            <class name="tests.CategoriesTest"/>
-            <class name="tests.LocationsTest"/>
-            <class name="tests.FilesTest"/>
+            <class name="tests.Categories.CategoriesValidTest"/>
+            <class name="tests.Categories.CategoriesInvalidTest"/>
         </classes>
     </test>
 
-    <test name="Test2">
+    <test name="Products">
         <classes>
-            <class name="tests.UsersTest"/>
-            <class name="tests.AuthTest"/>
+            <class name="tests.Products.ProductsValidTest"/>
+            <class name="tests.Products.ProductsInvalidTest"/>
         </classes>
     </test>
+
+    <test name="Delete Requests">
+        <classes>
+            <class name="tests.DeleteTests"/>
+        </classes>
+    </test>
+
+    <test name="Users">
+        <classes>
+            <class name="tests.Users.UsersValidTest"/>
+            <class name="tests.Users.UsersInvalidTest"/>
+        </classes>
+    </test>
+
+    <test name="Auth">
+        <classes>
+            <class name="tests.AuthJWT.AuthValidTest"/>
+            <class name="tests.AuthJWT.AuthInvalidTest"/>
+        </classes>
+    </test>
+
+    <test name="Files">
+        <classes>
+            <class name="tests.Files.FilesValidTest"/>
+            <class name="tests.Files.FilesInvalidTest"/>
+        </classes>
+    </test>
+
+    <test name="Locations">
+        <classes>
+            <class name="tests.Locations.LocationsValidTest"/>
+            <class name="tests.Locations.LocationsInvalidTest"/>
+        </classes>
+    </test>
+
 </suite>

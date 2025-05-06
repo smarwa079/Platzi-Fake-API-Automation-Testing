@@ -2,6 +2,7 @@ package DataProviders;
 
 import org.testng.annotations.DataProvider;
 import POJO.Product;
+import utils.Variables;
 
 import java.util.ArrayList;
 
@@ -13,12 +14,12 @@ public class ProductDataProvider
 
         Product validProduct = new Product();
 
-        validProduct.setTitle("Test Product");
+        validProduct.setTitle(Variables.productTitle);
         validProduct.setPrice(100);
         validProduct.setDescription("Test Product Description");
-        validProduct.setCategoryId(2);
+        validProduct.setCategoryId(Variables.categoryValidId);
         ArrayList<String> images1 = new ArrayList<>();
-        images1.add("https://i.ibb.co/9y2392F/test-product-image.jpg");
+        images1.add(Variables.productImage);
         validProduct.setImages(images1);
 
         return new Product[] {
@@ -26,16 +27,16 @@ public class ProductDataProvider
         };
     }
 
-    @DataProvider (name = "createProductInValidData")
-    public static Product[] createProductInValidData() {
+    @DataProvider (name = "createProductMissingCategory")
+    public static Product[] createProductMissingCategory() {
 
         Product inValidProduct = new Product();
 
-        inValidProduct.setTitle("T-shirt2s");
+        inValidProduct.setTitle(Variables.faker.commerce().productName());
         inValidProduct.setPrice(500);
         inValidProduct.setDescription("A description");
         ArrayList<String> images2 = new ArrayList<>();
-        images2.add("https://i.ibb.co/9y2392F/test-product-image.jpg");
+        images2.add(Variables.productImage);
         inValidProduct.setImages(images2);
 
         return new Product[] {
@@ -47,7 +48,7 @@ public class ProductDataProvider
     public static Product[] updateExistingProductValidData()
     {
         Product updatedProduct = new Product();
-        updatedProduct.setTitle("Desk");
+        updatedProduct.setTitle(Variables.faker.commerce().productName() + "Updated");
         updatedProduct.setPrice(1000);
 
         return new Product[]
@@ -61,7 +62,7 @@ public class ProductDataProvider
     public static Product[] updateNonExistentProductData()
     {
         Product updatedProduct = new Product();
-        updatedProduct.setTitle("Dress");
+        updatedProduct.setTitle(Variables.faker.commerce().productName() + "Updated");
         updatedProduct.setPrice(800);
 
         return new Product[]
